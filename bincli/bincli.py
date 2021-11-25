@@ -199,7 +199,7 @@ class BinanceClient:
         else:
             if len(position_info) < self.maxtx:
                 try:
-                    self.entry_market(symbol, margin, leverage, signal)
+                    self.entry_market(symbol, str(margin), leverage, signal)
                 except Exception as e:
                     if self.debug:
                         print(e, file=sys.stderr)
@@ -214,7 +214,7 @@ class BinanceClient:
         try:
             self.close_all_orders(symbol)
             self.exit_market(symbol)
-            self.entry_tpsl(symbol, margin, leverage, signal, tp, sl)
+            self.entry_tpsl(symbol, str(margin), leverage, signal, tp, sl)
         except Exception as e:
             if self.debug:
                 print(e, file=sys.stderr)
