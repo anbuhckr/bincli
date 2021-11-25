@@ -25,8 +25,7 @@ def save_sec(data):
 if __name__ == '__main__':
     if sys.argv[1] == 'api':
         save_key(sys.argv[2])
-        save_sec(sys.argv[3])
-        
+        save_sec(sys.argv[3])        
     elif sys.argv[1] == 'run':
         key = load_key()
         sec = load_sec()
@@ -35,8 +34,7 @@ if __name__ == '__main__':
         mar = sys.argv[4] 
         pos = sys.argv[5] 
         binbot = bincli.BinanceClient(key, sec)
-        binbot.run(sym, lev, str(mar), pos)
-        
+        binbot.run(sym, lev, str(mar), pos)        
     else:
         print('set api: bincli.py [api] [key] [secret]')
         print('run client: bincli.py [run] [symbol] [leverage] [margin] [side]')
