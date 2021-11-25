@@ -23,37 +23,47 @@ class BinanceClient:
             'Content-Type': 'application/json',
             'X-MBX-APIKEY': self.api_key
         }
-        try:
-            if req_type == 'del':
-                return requests.delete(url, headers=headers, timeout=30).json()
-            elif req_type == 'post':
-                return requests.post(url, headers=headers, timeout=30).json()
-            else:
-                return requests.get(url, headers=headers, timeout=30).json()
-        except Exception as e:
-            if self.debug:
-                print(e, file=sys.stderr)
-            pass
+        if req_type == 'del':
+            return requests.delete(url, headers=headers, timeout=30).json()
+        elif req_type == 'post':
+            return requests.post(url, headers=headers, timeout=30).json()
+        else:
+            return requests.get(url, headers=headers, timeout=30).json()
 
     def get_price(self, symbol):
         payload = f'symbol={symbol}&timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/ticker/price?{payload}&signature={signature}'
-        data = self.http_client('get', url)
+        try:
+            data = self.http_client('get', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.get_price(symbol)
         return float(data['price'])
 
     def exchange_info(self):
         payload = f'timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/exchangeInfo?{payload}&signature={signature}'
-        data = self.http_client('get', url)
+        try:
+            data = self.http_client('get', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.exchange_info()
         return data
 
     def get_balance(self):
         payload = f'timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v2/balance?{payload}&signature={signature}'
-        data = self.http_client('get', url)
+        try:
+            data = self.http_client('get', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.get_balance()
         balance = [x['balance'] for x in data if int(float(x['balance'])) != 0]
         self.balance = float(balance[0])
 
@@ -61,11 +71,21 @@ class BinanceClient:
         payload = f'symbol={symbol}&interval={tf}&limit=1500&timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/klines?{payload}&signature={signature}'
-        data = self.http_client('get', url)
+        try:
+            data = self.http_client('get', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.get_kline_data(symbol, tf)
         return data
 
     def base_precision(self, symbol):
-        data = self.exchange_info()
+        try:
+            data = self.exchange_info()
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.base_precision(symbol)
         item = [item for item in data['symbols'] if item['symbol'] == symbol][0]
         return item
 
@@ -73,14 +93,24 @@ class BinanceClient:
         payload = f'symbol={symbol}&timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/leverageBracket?{payload}&signature={signature}'
-        data = self.http_client('get', url)
+        try:
+            data = self.http_client('get', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.leverage_info(symbol)
         return data
 
     def positions_info(self):
         payload = f'timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v2/positionRisk?{payload}&signature={signature}'
-        data = self.http_client('get', url)
+        try:
+            data = self.http_client('get', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.positions_info()
         open_positions = []
         for x in data:
             if float(x['positionAmt'].replace('-', '')) > 0.00:
@@ -95,21 +125,36 @@ class BinanceClient:
         payload = f'symbol={symbol}&leverage={leverage}&timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/leverage?{payload}&signature={signature}'
-        data = self.http_client('post', url)
+        try:
+            data = self.http_client('post', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.set_leverage(symbol, leverage)
         return data
 
     def hedge_mode(self, mode):
         payload = f'dualSidePosition={mode}&timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/positionSide/dual?{payload}&signature={signature}'
-        data = self.http_client('post', url)
+        try:
+            data = self.http_client('post', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.hedge_mode(mode)
         return data
 
     def create_order(self, symbol, side, quantity, signal):
         payload = f'symbol={symbol}&type=MARKET&side={side}&quantity={quantity}&positionSide={signal}&timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/order?{payload}&signature={signature}'
-        data = self.http_client('post', url)
+        try:
+            data = self.http_client('post', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.create_order(symbol, side, quantity, signal)
         if self.debug:
             print(data, file=sys.stderr)
 
@@ -117,7 +162,12 @@ class BinanceClient:
         payload = f'symbol={symbol}&type={order}&side={side}&positionSide={signal}&stopPrice={price}&closePosition=true&timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/order?{payload}&signature={signature}'
-        data = self.http_client('post', url)
+        try:
+            data = self.http_client('post', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.tp_sl_order(symbol, order, side, signal, price)
         if self.debug:
             print(data, file=sys.stderr)
 
@@ -125,7 +175,12 @@ class BinanceClient:
         payload = f'symbol={symbol}&timestamp={self.get_time()}'
         signature = self.get_signature(payload)
         url = f'https://fapi.binance.com/fapi/v1/allOpenOrders?{payload}&signature={signature}'
-        data = self.http_client('del', url)
+        try:
+            data = self.http_client('del', url)
+        except Exception as e:
+            if self.debug:
+                print(e, file=sys.stderr)
+            return self.close_all_orders(symbol)
         if self.debug:
             print(data, file=sys.stderr)
 
