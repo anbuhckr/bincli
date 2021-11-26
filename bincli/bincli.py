@@ -207,77 +207,56 @@ class BinanceClient:
                 time.sleep(1)
 
     def entry_tpsl(self, symbol, margin, leverage, signal, tp, sl):
-        while True:
-            try:
-                if '%' in margin:
-                    self.get_balance()
-                    margin = ((self.balance * int(margin.replace('%', ''))) / 100)
-                base_precision = self.base_precision(symbol)
-                price = self.get_price(symbol)
-                quantity = f"{float(margin) * leverage / float(price):.{base_precision['quantityPrecision']}f}"
-                if signal == 'long':
-                    self.create_order(symbol, 'BUY', quantity, 'LONG')
-                    tp_price = f"{price + (price * tp):.{base_precision['pricePrecision']}f}"
-                    sl_price = f"{price - (price * sl):.{base_precision['pricePrecision']}f}"
-                    self.tp_sl_order(symbol, 'TAKE_PROFIT_MARKET', 'SELL', 'LONG', tp_price)
-                    self.tp_sl_order(symbol, 'STOP_MARKET', 'SELL', 'LONG', sl_price)
-                elif signal == 'short':
-                    self.create_order(symbol, 'SELL', quantity, 'SHORT')
-                    tp_price = f"{price - (price * tp):.{base_precision['pricePrecision']}f}"
-                    sl_price = f"{price + (price * sl):.{base_precision['pricePrecision']}f}"
-                    self.tp_sl_order(symbol, 'TAKE_PROFIT_MARKET', 'BUY', 'SHORT', tp_price)
-                    self.tp_sl_order(symbol, 'STOP_MARKET', 'BUY', 'SHORT', sl_price)
-                print(f"{signal.upper()} {symbol} @ {price}", file=sys.stderr)
-                break
-            except Exception as e:
-                if self.debug:
-                    print(e, file=sys.stderr)
-                time.sleep(1)
+        if '%' in margin:
+            self.get_balance()
+            margin = ((self.balance * int(margin.replace('%', ''))) / 100)
+        base_precision = self.base_precision(symbol)
+        price = self.get_price(symbol)
+        quantity = f"{float(margin) * leverage / float(price):.{base_precision['quantityPrecision']}f}"
+        if signal == 'long':
+            self.create_order(symbol, 'BUY', quantity, 'LONG')
+            tp_price = f"{price + (price * tp):.{base_precision['pricePrecision']}f}"
+            sl_price = f"{price - (price * sl):.{base_precision['pricePrecision']}f}"
+            self.tp_sl_order(symbol, 'TAKE_PROFIT_MARKET', 'SELL', 'LONG', tp_price)
+            self.tp_sl_order(symbol, 'STOP_MARKET', 'SELL', 'LONG', sl_price)
+        elif signal == 'short':
+            self.create_order(symbol, 'SELL', quantity, 'SHORT')
+            tp_price = f"{price - (price * tp):.{base_precision['pricePrecision']}f}"
+            sl_price = f"{price + (price * sl):.{base_precision['pricePrecision']}f}"
+            self.tp_sl_order(symbol, 'TAKE_PROFIT_MARKET', 'BUY', 'SHORT', tp_price)
+            self.tp_sl_order(symbol, 'STOP_MARKET', 'BUY', 'SHORT', sl_price)
+        print(f"{signal.upper()} {symbol} @ {price}", file=sys.stderr)
 
     def entry_market(self, symbol, margin, leverage, signal):
-        while True:
-            try:
-                if '%' in margin:
-                    self.get_balance()
-                    margin = ((self.balance * int(margin.replace('%', ''))) / 100)
-                base_precision = self.base_precision(symbol)
-                price = self.get_price(symbol)
-                quantity = f"{float(margin) * leverage / float(price):.{base_precision['quantityPrecision']}f}"
-                if signal == 'long':
-                    self.create_order(symbol, 'BUY', quantity, 'LONG')
-                elif signal == 'short':
-                    self.create_order(symbol, 'SELL', quantity, 'SHORT')
-                print(f"{signal.upper()} {symbol} @ {price}", file=sys.stderr)
-                break
-            except Exception as e:
-                if self.debug:
-                    print(e, file=sys.stderr)
-                time.sleep(1)
+        if '%' in margin:
+            self.get_balance()
+            margin = ((self.balance * int(margin.replace('%', ''))) / 100)
+        base_precision = self.base_precision(symbol)
+        price = self.get_price(symbol)
+        quantity = f"{float(margin) * leverage / float(price):.{base_precision['quantityPrecision']}f}"
+        if signal == 'long':
+            self.create_order(symbol, 'BUY', quantity, 'LONG')
+        elif signal == 'short':
+            self.create_order(symbol, 'SELL', quantity, 'SHORT')
+        print(f"{signal.upper()} {symbol} @ {price}", file=sys.stderr)
 
     def exit_market(self, symbol, position_info):
-        while True:
-            try:
-                for item in position_info:
-                    if item['symbol'] == symbol:
-                        if item['positionSide'] == 'LONG':
-                            price = self.get_price(symbol)
-                            self.create_order(item['symbol'], 'SELL', item['quantity'], 'LONG')
-                            if price > item['entryPrice']:
-                                print(f"TP {symbol} @ {price}", file=sys.stderr)
-                            else:
-                                print(f"SL {symbol} @ {price}", file=sys.stderr)
-                        elif item['positionSide'] == 'SHORT':
-                            price = self.get_price(symbol)
-                            self.create_order(item['symbol'], 'BUY', item['quantity'], 'SHORT')
-                            if price < item['entryPrice']:
-                                print(f"TP {symbol} @ {price}", file=sys.stderr)
-                            else:
-                                print(f"SL {symbol} @ {price}", file=sys.stderr)
-                break
-            except Exception as e:
-                if self.debug:
-                    print(e, file=sys.stderr)
-                time.sleep(1)
+        for item in position_info:
+            if item['symbol'] == symbol:
+                if item['positionSide'] == 'LONG':
+                    price = self.get_price(symbol)
+                    self.create_order(item['symbol'], 'SELL', item['quantity'], 'LONG')
+                    if price > item['entryPrice']:
+                        print(f"TP {symbol} @ {price}", file=sys.stderr)
+                    else:
+                        print(f"SL {symbol} @ {price}", file=sys.stderr)
+                elif item['positionSide'] == 'SHORT':
+                    price = self.get_price(symbol)
+                    self.create_order(item['symbol'], 'BUY', item['quantity'], 'SHORT')
+                    if price < item['entryPrice']:
+                        print(f"TP {symbol} @ {price}", file=sys.stderr)
+                    else:
+                        print(f"SL {symbol} @ {price}", file=sys.stderr)
 
     def run(self, symbol, leverage, margin, signal):
         while self.in_run:
