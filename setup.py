@@ -24,7 +24,7 @@ requirements = [
 setup(
     name='bincli',
     version=version,
-    description="Binance Client",
+    description="Binance Futures Client",
     long_description=readme,
     author="anbuhckr",
     author_email='anbu.hckr@hotmail.com',
