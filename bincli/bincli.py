@@ -7,7 +7,6 @@ class BinanceClient:
         self.api_key = key
         self.api_secret = secret
         self.in_run = False
-        self.balance = None
         self.debug = debug
         self.maxtx = maxtx
 
@@ -66,11 +65,9 @@ class BinanceClient:
                 url = f'https://fapi.binance.com/fapi/v2/balance?{payload}&signature={signature}'
                 data = self.http_client('get', url)
                 if len(data) > 0:
-                    balance = [x['balance'] for x in data if int(float(x['balance'])) != 0]
-                else:
-                    balance = [0.0000]
-                self.balance = balance
-                break
+                    balance = [float(x['balance']) for x in data if x['asset'] == 'USDT'][0]
+                    return balance
+                return None
             except Exception as e:
                 if self.debug:
                     print(e, file=sys.stderr)
@@ -90,15 +87,11 @@ class BinanceClient:
                 time.sleep(1)
 
     def base_precision(self, symbol):
-        while True:
-            try:
-                data = self.exchange_info()
-                item = [item for item in data['symbols'] if item['symbol'] == symbol][0]
-                return item
-            except Exception as e:
-                if self.debug:
-                    print(e, file=sys.stderr)
-                time.sleep(1)
+        data = self.exchange_info()
+        if len(data) > 0:
+            item = [item for item in data['symbols'] if item['symbol'] == symbol][0]
+            return item
+        return None
 
     def leverage_info(self, symbol):
         while True:
@@ -121,12 +114,12 @@ class BinanceClient:
                 url = f'https://fapi.binance.com/fapi/v2/positionRisk?{payload}&signature={signature}'
                 data = self.http_client('get', url)
                 open_positions = []
-                if len(data) > 0:
+                if len(data) > 0 and type(data[0]) is dict:
                     for x in data:
-                        if float(x['positionAmt'].replace('-', '')) > 0.00:
+                        q = float(x['positionAmt'].replace('-', ''))
+                        if q > 0:
                             s = x['symbol']
                             e = float(x['entryPrice'])
-                            q = float(x['positionAmt'].replace('-', ''))
                             p = x['positionSide']
                             open_positions.append({'symbol': s, 'entryPrice': e,'quantity': q, 'positionSide': p})
                 return open_positions
@@ -208,8 +201,8 @@ class BinanceClient:
 
     def entry_tpsl(self, symbol, margin, leverage, signal, tp, sl):
         if '%' in margin:
-            self.get_balance()
-            margin = ((self.balance * int(margin.replace('%', ''))) / 100)
+            balance = self.get_balance()
+            margin = ((balance * int(margin.replace('%', ''))) / 100)
         base_precision = self.base_precision(symbol)
         price = self.get_price(symbol)
         quantity = f"{float(margin) * leverage / float(price):.{base_precision['quantityPrecision']}f}"
@@ -229,8 +222,8 @@ class BinanceClient:
 
     def entry_market(self, symbol, margin, leverage, signal):
         if '%' in margin:
-            self.get_balance()
-            margin = ((self.balance * int(margin.replace('%', ''))) / 100)
+            balance = self.get_balance()
+            margin = ((balance * int(margin.replace('%', ''))) / 100)
         base_precision = self.base_precision(symbol)
         price = self.get_price(symbol)
         quantity = f"{float(margin) * leverage / float(price):.{base_precision['quantityPrecision']}f}"
@@ -266,7 +259,7 @@ class BinanceClient:
         if self.debug:
             print(position_info, file=sys.stderr)
         if signal == 'flat':
-            if position_info:
+            if len(position_info) > 0:
                 self.exit_market(symbol, position_info)
         else:
             if len(position_info) < self.maxtx:
