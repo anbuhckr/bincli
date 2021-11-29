@@ -40,7 +40,7 @@ $ python3 -m bincli api "your_api_key" "your_api_sec"
 Usage:
 
 ```
-# python3 -m bincli run symbol levrage margin side
+# python3 -m bincli run symbol leverage margin side
 $ python3 -m bincli run BTCUSDT 50 2 long
 ```
 
