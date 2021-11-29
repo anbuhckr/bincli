@@ -53,6 +53,6 @@ from bincli import BinanceClient
 
 key = ''
 sec = ''
-binbot = BinanceClient(key, sec, maxtx=10, debug=False)
+binbot = BinanceClient(key, sec, maxtx=10, debug=True)
 binbot.run('BTCUSDT', 50, 2, 'long')
 ```
