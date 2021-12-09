@@ -43,6 +43,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def exchange_info(self):
         while True:
@@ -56,6 +57,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def get_balance(self):
         while True:
@@ -72,6 +74,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def get_kline_data(self, symbol, tf):
         while True:
@@ -85,6 +88,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def base_precision(self, symbol):
         data = self.exchange_info()
@@ -105,6 +109,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def positions_info(self):
         while True:
@@ -127,6 +132,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def set_leverage(self, symbol, leverage):
         while True:
@@ -140,6 +146,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def hedge_mode(self, mode):
         while True:
@@ -153,6 +160,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def create_order(self, symbol, side, quantity, signal):
         while True:
@@ -168,6 +176,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def tp_sl_order(self, symbol, order, side, signal, price):
         while True:
@@ -183,6 +192,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def close_all_orders(self, symbol):
         while True:
@@ -198,6 +208,7 @@ class BinanceClient:
                 if self.debug:
                     print(e, file=sys.stderr)
                 time.sleep(1)
+                continue
 
     def entry_tpsl(self, symbol, margin, leverage, signal, tp, sl):
         if '%' in margin:
