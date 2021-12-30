@@ -171,7 +171,8 @@ class BinanceClient:
                 data = self.http_client('post', url)
                 if self.debug:
                     print(data, file=sys.stderr)
-                break
+                if data and 'code' not in data:
+                    break
             except Exception as e:
                 if self.debug:
                     print(e, file=sys.stderr)
@@ -187,7 +188,8 @@ class BinanceClient:
                 data = self.http_client('post', url)
                 if self.debug:
                     print(data, file=sys.stderr)
-                break
+                if data and 'code' not in data:
+                    break
             except Exception as e:
                 if self.debug:
                     print(e, file=sys.stderr)
@@ -203,7 +205,8 @@ class BinanceClient:
                 data = self.http_client('del', url)
                 if self.debug:
                     print(data, file=sys.stderr)
-                break
+                if data and 'code' not in data:
+                    break
             except Exception as e:
                 if self.debug:
                     print(e, file=sys.stderr)
