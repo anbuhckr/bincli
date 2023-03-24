@@ -58,8 +58,8 @@ binbot = BinanceClient(key, sec, maxtx=10, debug=True)
 # entry long in current price with leverage 50 margin 2
 binbot.run('BTCUSDT', 50, 2, 'long')
 
-# entry short in current price with leverage 50 margin 2
-binbot.run('BTCUSDT', 50, 2, 'short')
+# entry short in current price with leverage 50 margin 2%
+binbot.run('BTCUSDT', 50, '2%', 'short')
 
 # exit order in current price for long or short
 binbot.run('BTCUSDT', 50, 2, 'flat')
