@@ -54,5 +54,19 @@ from bincli import BinanceClient
 key = ''
 sec = ''
 binbot = BinanceClient(key, sec, maxtx=10, debug=True)
+
+# entry long in current price with leverage 50 margin 2
 binbot.run('BTCUSDT', 50, 2, 'long')
+
+# entry short in current price with leverage 50 margin 2
+binbot.run('BTCUSDT', 50, 2, 'short')
+
+# exit order in current price for long or short
+binbot.run('BTCUSDT', 50, 2, 'flat')
+
+# entry long in current price with leverage 50 margin 2 takeprofit 2% & sl 1%
+binbot.tpsl_run('BTCUSDT', 50, 2, 'long', 0.02, 0.01)
+
+# entry short in current price with leverage 50 margin 2 takeprofit 2% & sl 1%
+binbot.tpsl_run('BTCUSDT', 50, 2, 'short', 0.02, 0.01)
 ```
