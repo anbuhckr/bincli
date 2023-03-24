@@ -291,6 +291,7 @@ class BinanceClient:
             print(position_info, file=sys.stderr)
         if len(position_info) > 0:
             self.exit_market(symbol, position_info)
-        self.entry_tpsl(symbol, str(margin), leverage, signal, tp, sl)
+        if len(position_info) < self.maxtx:
+            self.entry_tpsl(symbol, str(margin), leverage, signal, tp, sl)
         self.in_run = False
         return None
