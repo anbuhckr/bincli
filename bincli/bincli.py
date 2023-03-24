@@ -286,7 +286,11 @@ class BinanceClient:
             time.sleep(0.5)
         self.in_run = True
         self.close_all_orders(symbol)
-        self.exit_market(symbol)
+        position_info = self.positions_info()
+        if self.debug:
+            print(position_info, file=sys.stderr)
+        if len(position_info) > 0:
+            self.exit_market(symbol, position_info)
         self.entry_tpsl(symbol, str(margin), leverage, signal, tp, sl)
         self.in_run = False
         return None
