@@ -205,7 +205,7 @@ class BinanceClient:
                 data = self.http_client('del', url)
                 if self.debug:
                     print(data, file=sys.stderr)
-                if data and 'code' not in data:
+                if data and data['code'] == 200:
                     break
             except Exception as e:
                 if self.debug:
