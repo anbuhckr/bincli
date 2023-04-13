@@ -196,10 +196,12 @@ class BinanceClient:
                 time.sleep(1)
                 continue
 
-    def close_all_orders(self, symbol):
+    def close_all_orders(self, symbol=False):
         while True:
             try:
-                payload = f'symbol={symbol}&timestamp={self.get_time()}'
+                payload = f'timestamp={self.get_time()}'
+                if symbol:
+                    payload = f'symbol={symbol}&timestamp={self.get_time()}'
                 signature = self.get_signature(payload)
                 url = f'https://fapi.binance.com/fapi/v1/allOpenOrders?{payload}&signature={signature}'
                 data = self.http_client('del', url)
