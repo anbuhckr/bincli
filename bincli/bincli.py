@@ -32,9 +32,8 @@ class BinanceClient:
     def get_price(self, symbol):
         while True:
             try:
-                payload = f'symbol={symbol}&timestamp={self.get_time()}'
-                signature = self.get_signature(payload)
-                url = f'https://fapi.binance.com/fapi/v1/ticker/price?{payload}&signature={signature}'
+                payload = f'symbol={symbol}'
+                url = f'https://fapi.binance.com/fapi/v1/ticker/price?{payload}'
                 data = self.http_client('get', url)
                 if len(data) > 0:
                     return float(data['price'])
