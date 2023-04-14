@@ -4,4 +4,4 @@ from __future__ import unicode_literals
 
 from .bincli import BinanceClient
 
-__version__ = '1.5.0'
+__version__ = '1.6.0'
