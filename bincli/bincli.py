@@ -97,12 +97,16 @@ class BinanceClient:
         return None
 
     def leverage_info(self, symbol):
+        while self.in_run:
+            time.sleep(0.5)
+        self.in_run = True
         while True:
             try:
                 payload = f'symbol={symbol}&timestamp={self.get_time()}'
                 signature = self.get_signature(payload)
                 url = f'https://fapi.binance.com/fapi/v1/leverageBracket?{payload}&signature={signature}'
                 data = self.http_client('get', url)
+                self.in_run = False
                 return data
             except Exception as e:
                 if self.debug:
@@ -111,6 +115,9 @@ class BinanceClient:
                 continue
 
     def positions_info(self):
+        while self.in_run:
+            time.sleep(0.5)
+        self.in_run = True
         while True:
             try:
                 payload = f'timestamp={self.get_time()}'
@@ -126,6 +133,7 @@ class BinanceClient:
                             e = float(x['entryPrice'])
                             p = x['positionSide']
                             open_positions.append({'symbol': s, 'entryPrice': e,'quantity': q, 'positionSide': p})
+                self.in_run = False
                 return open_positions
             except Exception as e:
                 if self.debug:
