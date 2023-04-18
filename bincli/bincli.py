@@ -115,9 +115,6 @@ class BinanceClient:
                 continue
 
     def positions_info(self):
-        while self.in_run:
-            time.sleep(0.5)
-        self.in_run = True
         while True:
             try:
                 payload = f'timestamp={self.get_time()}'
@@ -133,7 +130,6 @@ class BinanceClient:
                             e = float(x['entryPrice'])
                             p = x['positionSide']
                             open_positions.append({'symbol': s, 'entryPrice': e,'quantity': q, 'positionSide': p})
-                self.in_run = False
                 return open_positions
             except Exception as e:
                 if self.debug:
